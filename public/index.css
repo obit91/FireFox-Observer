@@ -1,5 +1,11 @@
 .panel {
-padding: 5px;
+    padding: 5px;
+}
+
+.center {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 ul {
@@ -13,15 +19,12 @@ ul {
     transition: transform .2s;
 }
 
-ul > li {
+ul>li {
     /* Display the elements in one line */
     display: inline-block;
 }
 
-ul > li:hover {
-    transform: scale(1.5); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
-  }
-
-.text-section-view {
-font-size: large;
+ul>li:hover {
+    transform: scale(1.5);
+    /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
 }
