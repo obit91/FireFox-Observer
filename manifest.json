@@ -6,15 +6,12 @@
   
     "description": "Easily see which information is stored on you, for the current active session.",
   
-    "icons": {
-      "48": "icons/spyglass_48.jpg"
-    },
-  
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],
-        "js": ["src/Observer.js"]
+    "browser_action": {
+      "browser_style": true,
+      "default_popup": "public/index.html",
+      "default_icon": {
+        "16": "icons/spyglass_16.jpg",
+        "32": "icons/spyglass_32.jpg"
       }
-    ]
-  
-  }
+    }
+}

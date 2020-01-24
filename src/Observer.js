@@ -1,5 +1,5 @@
-
 browser.browserAction.onClicked.addListener((tab) => {
+    console.log('Clicked extension.')
     const cookies = getCookies();
     console.log(cookies);
 });
