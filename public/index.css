@@ -2,7 +2,7 @@ html, body {
     width: 300px;
   }
   
-  .page-choice {
+  .operation-choice {
     width: 100%;
     padding: 4px;
     font-size: 1.5em;
@@ -10,6 +10,6 @@ html, body {
     cursor: pointer;
   }
   
-  .page-choice:hover {
+  .operation-choice:hover {
     background-color: #CFF2F2;
   }

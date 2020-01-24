@@ -5,13 +5,16 @@
     "version": "1.0",
   
     "description": "Easily see which information is stored on you, for the current active session.",
-  
-    "browser_action": {
+
+    "page_action": {
       "browser_style": true,
-      "default_popup": "public/index.html",
       "default_icon": {
         "16": "icons/spyglass_16.jpg",
-        "32": "icons/spyglass_32.jpg"
-      }
+        "32": "icons/spyglass_32.jpg",
+        "48": "icons/spyglass_48.jpg"
+      },
+      "default_title": "Observe your data!",
+      "show_matches": ["<all_urls>"],
+      "default_popup": "public/index.html"
     }
 }
