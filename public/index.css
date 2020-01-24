@@ -1,15 +1,11 @@
 html, body {
-    width: 300px;
+    width: 500px;
   }
   
-  .operation-choice {
-    width: 100%;
-    padding: 4px;
-    font-size: 1.5em;
-    text-align: center;
-    cursor: pointer;
+  .panel {
+    padding: 5px;
   }
   
-  .operation-choice:hover {
-    background-color: #CFF2F2;
+  li {
+    margin-bottom: 5px;
   }
