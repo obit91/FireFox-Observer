@@ -4,15 +4,17 @@ const VIEWS = {
 }
 
 const ELEMENT_TYPES = {
+    ListTitle: 'list-title',
+    ListWrapper: 'list-wrapper',
     AgentsList: 'agents-list',
-    CookiesList: 'cookies-list',
-    TrackersList: 'trackers-list'
+    DataList: 'data-list'
 }
 
 const AGENT_NAMES = {
     Agents: 'agents',
     Cookies: 'cookies',
-    Trackers: 'trackers'
+    Trackers: 'trackers',
+    Permissions: 'permissions'
 }
 
 const AGENTS = [{
@@ -22,14 +24,16 @@ const AGENTS = [{
     {
         name: AGENT_NAMES.Trackers,
         callback: populateTrackers
+    },
+    {
+        name: AGENT_NAMES.Permissions,
+        callback: populatePermissions
     }
 ]
 
-let tabs = null;
+let tab = null;
 
 function setHeaders() {
-
-    const tab = tabs.pop();
 
     const headerNode = document.getElementById('header-title');
     const urlString = tab.url;
@@ -40,67 +44,69 @@ function setHeaders() {
     //const currentView = urlViewArray[urlViewArray.length - 1];
 
     //set the header of the panel
-    const text = document.createTextNode(`Agents used by ${url.hostname}`);
+    const text = document.createTextNode(`${url.hostname}`);
     headerNode.appendChild(text);
 }
 
-function setSubTitle(listType) {
-    const titleNode = document.getElementById('list-title');
-    const text = document.createTextNode(`Listing ${listType}`);
-    titleNode.appendChild(text);
+function populateTrackers() {
+    const currentView = document.getElementById(ELEMENT_TYPES.DataList);
+    currentView.innerHTML = `<p>howdy there trackers</p>`
 }
 
-function populateTrackers() {
-
+function populatePermissions() {
+    const currentView = document.getElementById(ELEMENT_TYPES.DataList);
+    currentView.innerHTML = `<p>howdy there permissions</p>`
 }
 
 async function populateCookies() {
 
-    //get the first tab object in the array
-    let tab = tabs.pop();
-
     //get all cookies in the domain
-    var gettingAllCookies = browser.cookies.getAll({
+    const gettingAllCookies = browser.cookies.getAll({
         url: tab.url
     });
 
     const cookies = await gettingAllCookies;
-
-    //set the header of the panel
-    var activeTabUrl = document.getElementById('header-title');
-    var text = document.createTextNode("Cookies at: " + tab.title);
-    var cookieList = document.getElementById('cookie-list');
-    activeTabUrl.appendChild(text);
+    console.log(cookies)
+    const dataList = document.getElementById(ELEMENT_TYPES.dataList);
+    console.log(dataList)
+    let innerData = `<p>No cookies in this tab.</p>`;
 
     if (cookies.length > 0) {
-        //add an <li> item with the name and value of the cookie to the list
-        for (let cookie of cookies) {
-            let li = document.createElement("li");
-            let content = document.createTextNode(cookie.name + ": " + cookie.value);
-            li.appendChild(content);
-            cookieList.appendChild(li);
-        }
-    } else {
-        let p = document.createElement("p");
-        let content = document.createTextNode("No cookies in this tab.");
-        let parent = cookieList.parentNode;
+        innerData = cookies.map(cookie => {
+                `<li id=${cookie.name}>${cookie.name}</li>`
+            })
+            .join('');
+        dataList.innerHTML = innerData;
+    };
+}
 
-        p.appendChild(content);
-        parent.appendChild(p);
-    }
+function activateAgentView(agent) {
+
+    // show the agents tab.
+    const listWrapperNode = document.getElementById(ELEMENT_TYPES.ListWrapper);
+    listWrapperNode.hidden = false;
+
+    // drop current agent.
+    const currentAgentList = document.getElementById(ELEMENT_TYPES.DataList);
+    currentAgentList.innerHTML = '';
+
+    agent.callback();
 }
 
 function populateAgents() {
 
-    const agentsList = document.getElementById(ELEMENT_TYPES.AgentsList);
+    // hiden current agent view.
+    const listWrapper = document.getElementById(ELEMENT_TYPES.ListWrapper);
+    listWrapper.hidden = true;
 
-    setSubTitle(AGENT_NAMES.Agents);
+    const agentsList = document.getElementById(ELEMENT_TYPES.AgentsList);
 
     for (const agent of AGENTS) {
         let li = document.createElement("li");
         let content = document.createTextNode(agent.name);
         li.appendChild(content);
-        li.onclick = agent.callback;
+        li.onclick = activateAgentView.bind(null, agent);
+        li.id = `agent-${agent.name}`;
         agentsList.appendChild(li);
     }
 }
@@ -116,6 +122,7 @@ function getActiveTab() {
 
 function showOptions(currentTabs) {
     tabs = currentTabs;
+    tab = tabs.pop();
     setHeaders()
     populateAgents()
 }

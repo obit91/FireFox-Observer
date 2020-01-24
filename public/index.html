@@ -4,21 +4,23 @@
 
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 </head>
 
 <body>
-    <div class="panel">
-        <div class="panel-section panel-section-header">
-            <div class="text-section-header center" id="header-title"></div>
+    <h2 id="header-title"></h2>
+    <div class="panel panel-primary">
+        <div class="panel-heading center" id="agents-title">Listing Agents</div>
+        <div class='panel-body'>
+            <ul class='center' id="agents-list"></ul>
         </div>
-        <div class="panel-section panel-section-header">
-            <div class="text-section-header center" id="list-title"></div>
-        </div>
-        <ul id="agents-list"></ul>
-        <ul hidden id="cookies-list"></ul>
-        <ul hidden id="trackers-list"></ul>
-        <script src="../src/Observer.js"></script>
+    </div>
+    <div hidden id='list-wrapper' hidden class="panel-section">
+        <ul id="data-list"></ul>
+    </div>
+    <script src="../src/Observer.js"></script>
 </body>
 
 </html>
