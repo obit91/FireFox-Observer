@@ -66,18 +66,17 @@ async function populateCookies() {
     });
 
     const cookies = await gettingAllCookies;
-    console.log(cookies)
-    const dataList = document.getElementById(ELEMENT_TYPES.dataList);
-    console.log(dataList)
-    let innerData = `<p>No cookies in this tab.</p>`;
-
+    const currentView = document.getElementById(ELEMENT_TYPES.DataList);
+    let innerData = `<li>No cookies in this tab.</li>`;
     if (cookies.length > 0) {
-        innerData = cookies.map(cookie => {
-                `<li id=${cookie.name}>${cookie.name}</li>`
-            })
+        // map-reduce all the cookies into one string of buttons.
+        innerData = cookies.map(cookie => `<button id="${cookie.name}" 
+                                            class="list-group-item list-group-item-info list-group-item-action">
+                                            ${cookie.name}
+                                            </button>`)
             .join('');
-        dataList.innerHTML = innerData;
     };
+    currentView.innerHTML = innerData;
 }
 
 function activateAgentView(agent) {
