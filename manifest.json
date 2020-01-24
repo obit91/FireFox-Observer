@@ -1,0 +1,20 @@
+{
+    
+    "manifest_version": 2,
+    "name": "Observer",
+    "version": "1.0",
+  
+    "description": "Easily see which information is stored on you, for the current active session.",
+  
+    "icons": {
+      "48": "icons/spyglass_48.jpg"
+    },
+  
+    "content_scripts": [
+      {
+        "matches": ["*"],
+        "js": ["src/Observer.js"]
+      }
+    ]
+  
+  }
