@@ -5,6 +5,7 @@ const VIEWS = {
 
 const ELEMENT_TYPES = {
     ListTitle: 'list-title',
+    ListInstructions: 'list-instructions',
     ListWrapper: 'list-wrapper',
     AgentsList: 'agents-list',
     DataList: 'data-list'
@@ -55,9 +56,30 @@ function populateTrackers() {
     currentView.innerHTML = `<p>howdy there trackers</p>`
 }
 
-function populatePermissions() {
+async function populatePermissions() {
+
+    //get all permissions used by the domain
+    const gettingAllPermissions = navigator.permissions.getAll({
+        url: tab.url
+    });
+
+    const permissions = await gettingAllPermissions;
     const currentView = document.getElementById(ELEMENT_TYPES.DataList);
-    currentView.innerHTML = `<p>howdy there permissions</p>`
+    let innerData = `<li>No permissions requested by this page.</li>`;
+    if (permissions.length > 0) { 
+        // map-reduce all the permissions into one string of buttons.
+        innerData = permissions.map(permission => `<li id="${permission.name}" 
+                                            class="nav-item dropdown">
+                                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                                ${permission.name}
+                                                </a>
+                                                <div class="dropdown-menu">
+                                                    <div class="dropdown-item">${permission.value}</a>
+                                                </div>
+                                            </li>`)
+            .join('');
+    };
+    currentView.innerHTML = innerData;
 }
 
 async function populateCookies() {
@@ -72,10 +94,15 @@ async function populateCookies() {
     let innerData = `<li>No cookies in this tab.</li>`;
     if (cookies.length > 0) { 
         // map-reduce all the cookies into one string of buttons.
-        innerData = cookies.map(cookie => `<button id="${cookie.name}" 
-                                            class="list-group-item list-group-item-secondar list-group-item-action">
-                                            ${cookie.name}
-                                            </button>`)
+        innerData = cookies.map(cookie => `<li id="${cookie.name}" 
+                                            class="nav-item dropdown">
+                                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                                ${cookie.name}
+                                                </a>
+                                                <div class="dropdown-menu">
+                                                    <div class="dropdown-item">${cookie.value}</a>
+                                                </div>
+                                            </li>`)
             .join('');
     };
     currentView.innerHTML = innerData;
@@ -102,6 +129,8 @@ function populateAgents() {
 
     const agentsList = document.getElementById(ELEMENT_TYPES.AgentsList);
 
+    const agentsInstructions = document.getElementById(ELEMENT_TYPES.ListInstructions)
+
     for (const agent of AGENTS) {
         // creates a list item.
         let li = document.createElement("li");
@@ -114,8 +143,9 @@ function populateAgents() {
         a.setAttribute('href', '#');
         a.innerHTML = agent.name;
         a.onclick = (e) => {
-            currentActiveView.classList.remove('active');
-            a.classList.add('active');
+            agentsInstructions.hidden = true;
+            currentActiveView.active = false;
+            a.active = true;
             currentActiveView = a;
         }
 
