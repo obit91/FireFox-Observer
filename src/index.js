@@ -1,4 +1,6 @@
+
 const isTrackingDomain = require('is-tracking-domain')
+const waitUntil = require('async-wait-until');
 
 const VIEWS = {
     main: "main",
@@ -38,6 +40,8 @@ let tab = null;
 
 let currentActiveView = null;
 
+let activeTrackersHtml = null;
+
 function setHeaders() {
 
     const headerNode = document.getElementById('header-title');
@@ -53,17 +57,40 @@ function setHeaders() {
     headerNode.appendChild(text);
 }
 
-function populateTrackers() {
+async function getHtmlContent(tab) {
+    const resolvedHtml = (htmlContent) => {
+        activeTrackersHtml = htmlContent;
+    }
+    await browser.tabs.executeScript(tab.id, {
+        "code": "document.documentElement.outerHTML;"
+    }, resolvedHtml)
+
+    const htmlContent = await waitUntil(() => {
+        return activeTrackersHtml != null
+    }, 15000, 250)
+    
+    return activeTrackersHtml;
+}
+
+async function populateTrackers() {
 
     // isTrackingDomain('doubleclick.net')
+    htmlContent = await getHtmlContent(tab);
 
-    $('script[src], link[href]').each(function (i, e) {
-        var item = ((e.nodeName == "LINK") ? $(this).attr('href') : $(this).attr('src'))
-        console.log(item.split("/").pop())
-    })
+    tempDiv = document.createElement("div");
+    tempDiv.innerHTML = htmlContent;
+
+    // convert the node list into an array.
+    const scripts = [...tempDiv.querySelectorAll("script[src]")];
+
+    let resultList = 'No trackers found on this page.'
+    if (scripts.length > 0) {
+        resultList = scripts.map(source => `<li>${source.src}</li>`)
+            .join('')
+    }
 
     const currentView = document.getElementById(ELEMENT_TYPES.DataList);
-    currentView.innerHTML = `<p>howdy there trackers</p>`
+    currentView.innerHTML = resultList;
 }
 
 async function populatePermissions() {
@@ -76,7 +103,7 @@ async function populatePermissions() {
     const permissions = await gettingAllPermissions;
     const currentView = document.getElementById(ELEMENT_TYPES.DataList);
     let innerData = `<li>No permissions requested by this page.</li>`;
-    if (permissions.length > 0) { 
+    if (permissions.length > 0) {
         // map-reduce all the permissions into one string of buttons.
         innerData = permissions.map(permission => `<li id="${permission.name}" 
                                             class="nav-item dropdown">
@@ -102,7 +129,7 @@ async function populateCookies() {
     const cookies = await gettingAllCookies;
     const currentView = document.getElementById(ELEMENT_TYPES.DataList);
     let innerData = `<li>No cookies in this tab.</li>`;
-    if (cookies.length > 0) { 
+    if (cookies.length > 0) {
         // map-reduce all the cookies into one string of buttons.
         innerData = cookies.map(cookie => `<li id="${cookie.name}" 
                                             class="nav-item dropdown">

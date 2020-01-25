@@ -7,6 +7,8 @@
     "build1": "webpack",
     "build2": "web-ext build --overwrite-dest",
     "build": "npm run build1 & npm run build2",
+    "start": "npm run build & npm run start:firefox",
+    "start:quick": "npm run start:firefox",
     "start:firefox": "web-ext run",
     "start:firefox-dist": "web-ext run --source-dir ./extension-dist/",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -27,6 +29,7 @@
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
+    "async-wait-until": "^1.2.4",
     "is-tracking-domain": "^1.1.8"
   }
 }

@@ -3,7 +3,7 @@
     "manifest_version": 2,
     "name": "Observer",
     "version": "1.0",
-    "permissions": ["cookies","<all_urls>","tabs"],
+    "permissions": ["cookies","<all_urls>","tabs", "activeTab"],
 
     "description": "Easily see which information is stored on you, for the current active session.",
 
