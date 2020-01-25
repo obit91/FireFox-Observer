@@ -60,7 +60,8 @@ const PERMISSION_STATES = {
     Granted: 'granted',
     Denied: 'denied',
     Prompt: 'prompt',
-    Unsupported: 'unsupported'
+    Unsupported: 'unsupported',
+    NotFound: 'not-found'
 }
 
 let tab = null;
@@ -128,13 +129,20 @@ async function populateTrackers() {
         return tracker ? `<li class="text-danger">${url}</li>` : `<li class="text-success">${url}</li>`;
     }
 
+    const checkTrackingDomain = (url) => {
+        const url1 = url.indexOf(`www.`) == 0 ? url.slice(`www.`.length) : url;
+        const url2 = `https://${url}`;
+        const url3 = `https://${url1}`;
+        return isTrackingDomain(url) || isTrackingDomain(url1) || isTrackingDomain(url2) || isTrackingDomain(url3);
+    }
+
     let blackListed = 'No trackers found on this page.'
     if (scripts.length > 0) {
         blackListed = scripts
             .map(source => (new URL(source.src)).hostname)
             .filter((url, i, arr) => arr.indexOf(url) == i) // remove duplicates
             .map(url => url.indexOf(`www.`) == 0 ? url.slice(`www.`.length) : url)
-            .map(url => addli(url, isTrackingDomain(url)))
+            .map(url => addli(url, checkTrackingDomain(url)))
             .join('')
     }
 
@@ -146,16 +154,15 @@ async function populatePermissions() {
     const currentView = document.getElementById(ELEMENT_TYPES.DataList);
     currentView.innerHTML = generateLoadingSpinner('permissions')
 
-    // const permissionStatus = await window.navigator.permissions.query({name:'geolocation'});
-    // alert(permissionStatus.state);
-
     // retrieve all permission states
-    const permissionStates = []
+    let permissionStates = []
     PERMISSIONS.forEach(async permission => {
         window.navigator.permissions
-        .query({name: permission})
-        .then(permissionStatus => permissionStates.push([permission, permissionStatus.state]))
-        .catch(err => permissionStates.push([permission, PERMISSION_STATES.Unsupported]))
+            .query({
+                name: permission
+            })
+            .then(permissionStatus => permissionStates.push([permission, permissionStatus.state]))
+            .catch(err => permissionStates.push([permission, PERMISSION_STATES.Unsupported]))
     })
 
     // can be replaced with async for.
@@ -163,16 +170,76 @@ async function populatePermissions() {
         return permissionStates.length == PERMISSIONS.length
     }, 3000, 50)
 
+    console.table(permissionStates);
+
+    let parsedMicAndCam = 0;
+
+    // let permissionsWithMicAndCam = []
+    permissionStates.forEach(([permission, state], i) => {
+        if (state != PERMISSION_STATES.Unsupported) {
+            permissionStates[i] = [permission, state]
+        } else if (permission == 'camera') {
+            let constraints = {
+                video: true
+            };
+            window.navigator.mediaDevices.getUserMedia(constraints)
+                .then((stream) => {
+                    permissionStates[i] = [permission, PERMISSION_STATES.Granted];
+                })
+                .catch((err) => {
+                    console.log(err.name)
+                    if (err.name == "NotAllowedError") {
+                        permissionStates[i] = [permission, PERMISSION_STATES.Denied];
+                    } if (err.name == "NotFoundError") {
+                        permissionStates[i] = [permission, PERMISSION_STATES.NotFound];
+                    } else {
+                        permissionStates[i] = [permission, state];
+                    }
+                })
+                .finally(() => {
+                    parsedMicAndCam += 1;
+                });
+        } else if (permission == 'microphone') {
+            let constraints = {
+                audio: true
+            };
+            window.navigator.mediaDevices.getUserMedia(constraints)
+                .then((stream) => {
+                    permissionStates[i] = [permission, PERMISSION_STATES.Granted];
+                })
+                .catch((err) => {
+                    if (err.name == "NotAllowedError") {
+                        permissionStates[i] = [permission, PERMISSION_STATES.Denied];
+                    } else {
+                        permissionStates[i] = [permission, state];
+                    }
+                })
+                .finally(() => {
+                    parsedMicAndCam += 1;
+                });
+        } else {
+            permissionStates[i] = [permission, state]
+        }
+    })
+
+    // can be replaced with async for.
+    await waitUntil(() => {
+        return parsedMicAndCam == 2
+    }, 3000, 50)
+
+    console.table(permissionStates);
+
     function renderStateDiv(permission, state) {
         let messageColor = '';
-        switch(state) {
-            case(PERMISSION_STATES.Granted):
+        switch (state) {
+            case (PERMISSION_STATES.Granted):
                 messageColor = 'danger';
                 break;
-            case(PERMISSION_STATES.Denied):
+            case (PERMISSION_STATES.Denied):
+            case (PERMISSION_STATES.NotFound):
                 messageColor = 'success';
                 break;
-            case(PERMISSION_STATES.Prompt):
+            case (PERMISSION_STATES.Prompt):
                 messageColor = 'info';
                 break;
             default:
