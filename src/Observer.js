@@ -68,10 +68,10 @@ async function populateCookies() {
     const cookies = await gettingAllCookies;
     const currentView = document.getElementById(ELEMENT_TYPES.DataList);
     let innerData = `<li>No cookies in this tab.</li>`;
-    if (cookies.length > 0) {
+    if (cookies.length > 0) { 
         // map-reduce all the cookies into one string of buttons.
         innerData = cookies.map(cookie => `<button id="${cookie.name}" 
-                                            class="list-group-item list-group-item-info list-group-item-action">
+                                            class="list-group-item list-group-item-secondar list-group-item-action">
                                             ${cookie.name}
                                             </button>`)
             .join('');
@@ -101,11 +101,19 @@ function populateAgents() {
     const agentsList = document.getElementById(ELEMENT_TYPES.AgentsList);
 
     for (const agent of AGENTS) {
+        // creates a list item.
         let li = document.createElement("li");
-        let content = document.createTextNode(agent.name);
-        li.appendChild(content);
+        li.classList.add('nav-item');
         li.onclick = activateAgentView.bind(null, agent);
         li.id = `agent-${agent.name}`;
+
+        let a = document.createElement("a");
+        a.classList.add('nav-link')
+        a.setAttribute('href', '#');
+        a.innerHTML = agent.name;
+
+        li.appendChild(a);
+
         agentsList.appendChild(li);
     }
 }

@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="index.css" />
-    <link rel="stylesheet" href="../resources/bootstrap-4.3.1-dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="../resources/bootstrap-4.3.1-dist/css/bootstrap.min.css" />
 
     <script src="../resources/jquery-3.4.1-dist/jquery-3.4.1.min.js"></script>
     <script src="../resources/popper-dist/popper.min.js"></script>
@@ -14,19 +14,23 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="nav-item nav-link" href="#">Features</a>
-        <a class="nav-item nav-link" href="#">Features2</a>
-    </nav>
-    <h2 class='center' id="header-title"></h2>
-    <div class="panel panel-primary">
-        <div class="panel-heading center" id="agents-title">Listing Agents</div>
-        <div class='panel-body'>
-            <ul class='nav nav-tabs nav-justified' id="agents-list"></ul>
+    <div class="card bg-light mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title text-center">Listing Agents</h5>
+                <h6 id="header-title" class="card-subtitle mb-2 text-muted text-center"></h6>
+                <ul id='agents-list' class="nav nav-tabs card-header-tabs"></ul>
+            </div>
+
+            <div class="card-body">
+                <h5 class="card-title text-center">Agent Data</h5>
+                <p class="card-text">
+                    <div hidden id='list-wrapper' hidden>
+                        <ul class="list-group list-group-flush" id="data-list"></ul>
+                    </div>
+                </p>
+            </div>
         </div>
-    </div>
-    <div hidden id='list-wrapper' hidden class="panel-section">
-        <ul class="list-group" id="data-list"></ul>
     </div>
     <script src="../src/Observer.js"></script>
 </body>
