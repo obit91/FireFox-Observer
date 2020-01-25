@@ -33,6 +33,8 @@ const AGENTS = [{
 
 let tab = null;
 
+let currentActiveView = null;
+
 function setHeaders() {
 
     const headerNode = document.getElementById('header-title');
@@ -111,6 +113,11 @@ function populateAgents() {
         a.classList.add('nav-link')
         a.setAttribute('href', '#');
         a.innerHTML = agent.name;
+        a.onclick = (e) => {
+            currentActiveView.classList.remove('active');
+            a.classList.add('active');
+            currentActiveView = a;
+        }
 
         li.appendChild(a);
 
