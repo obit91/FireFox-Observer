@@ -55,7 +55,12 @@ function setHeaders() {
 
 function populateTrackers() {
 
-    isTrackingDomain('doubleclick.net')
+    // isTrackingDomain('doubleclick.net')
+
+    $('script[src], link[href]').each(function (i, e) {
+        var item = ((e.nodeName == "LINK") ? $(this).attr('href') : $(this).attr('src'))
+        console.log(item.split("/").pop())
+    })
 
     const currentView = document.getElementById(ELEMENT_TYPES.DataList);
     currentView.innerHTML = `<p>howdy there trackers</p>`

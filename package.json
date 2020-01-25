@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "build1": "webpack",
-    "build2": "web-ext build",
+    "build2": "web-ext build --overwrite-dest",
+    "build": "npm run build1 & npm run build2",
     "start:firefox": "web-ext run",
     "start:firefox-dist": "web-ext run --source-dir ./extension-dist/",
     "test": "echo \"Error: no test specified\" && exit 1"
