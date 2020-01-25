@@ -91,12 +91,17 @@ async function populateTrackers() {
     // convert the node list into an array.
     const scripts = [...tempDiv.querySelectorAll("script[src]")];
 
+    const addli = (url, tracker) => {
+        return tracker ? `<li class="text-danger">${url}</li>` : `<li class="text-success">${url}</li>`;
+    }
+
     let blackListed = 'No trackers found on this page.'
     if (scripts.length > 0) {
-        // resultList = scripts.map(source => `<li>${source.src}</li>`)
-        //     .join('')
-        blackListed = scripts.map(source => (new URL(source.src)).hostname)
-        .map(url => isTrackingDomain(url) ? `<li>${url}</li>` : '')
+        blackListed = scripts
+        .map(source => (new URL(source.src)).hostname)
+        .filter((url, i, arr) => arr.indexOf(url) == i) // remove duplicates
+        .map(url => url.indexOf(`www.`) == 0 ? url.slice(`www.`.length) : url)
+        .map(url => addli(url, isTrackingDomain(url)))
         .join('')
     }
 
