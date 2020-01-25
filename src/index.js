@@ -74,6 +74,15 @@ async function getHtmlContent(tab) {
 
 async function populateTrackers() {
 
+    const currentView = document.getElementById(ELEMENT_TYPES.DataList);
+    currentView.innerHTML = `<p class="text-center">Analyzing trackers . . .
+                                <div class="d-flex justify-content-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                            </p>`
+
     htmlContent = await getHtmlContent(tab);
 
     tempDiv = document.createElement("div");
@@ -82,7 +91,7 @@ async function populateTrackers() {
     // convert the node list into an array.
     const scripts = [...tempDiv.querySelectorAll("script[src]")];
 
-    let resultList = 'No trackers found on this page.'
+    let blackListed = 'No trackers found on this page.'
     if (scripts.length > 0) {
         // resultList = scripts.map(source => `<li>${source.src}</li>`)
         //     .join('')
@@ -91,7 +100,6 @@ async function populateTrackers() {
         .join('')
     }
 
-    const currentView = document.getElementById(ELEMENT_TYPES.DataList);
     currentView.innerHTML = blackListed;
 }
 
