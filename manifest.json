@@ -4,7 +4,6 @@
     "name": "Observer",
     "version": "1.0",
     "permissions": ["cookies","<all_urls>","tabs"],
-    "content_security_policy": "script-src 'self' https://code.jquery.com https://cdn.jsdelivr.net/npm/ https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js; object-src 'self'",
 
     "description": "Easily see which information is stored on you, for the current active session.",
 
