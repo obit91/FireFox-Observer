@@ -74,7 +74,6 @@ async function getHtmlContent(tab) {
 
 async function populateTrackers() {
 
-    // isTrackingDomain('doubleclick.net')
     htmlContent = await getHtmlContent(tab);
 
     tempDiv = document.createElement("div");
@@ -85,12 +84,15 @@ async function populateTrackers() {
 
     let resultList = 'No trackers found on this page.'
     if (scripts.length > 0) {
-        resultList = scripts.map(source => `<li>${source.src}</li>`)
-            .join('')
+        // resultList = scripts.map(source => `<li>${source.src}</li>`)
+        //     .join('')
+        blackListed = scripts.map(source => (new URL(source.src)).hostname)
+        .map(url => isTrackingDomain(url) ? `<li>${url}</li>` : '')
+        .join('')
     }
 
     const currentView = document.getElementById(ELEMENT_TYPES.DataList);
-    currentView.innerHTML = resultList;
+    currentView.innerHTML = blackListed;
 }
 
 async function populatePermissions() {
