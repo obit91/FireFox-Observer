@@ -1,0 +1,28 @@
+{
+  "name": "firefox-observer",
+  "version": "1.0.0",
+  "description": "Easily see which information is stored on you, for the current active session.",
+  "main": "index.js",
+  "scripts": {
+    "build": "web-ext build",
+    "start:firefox": "web-ext run",
+    "start:firefox-dist": "web-ext run --source-dir ./extension-dist/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/obit91/FireFox-Observer.git"
+  },
+  "author": "obit91",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/obit91/FireFox-Observer/issues"
+  },
+  "homepage": "https://github.com/obit91/FireFox-Observer#readme",
+  "devDependencies": {
+    "web-ext": "^4.0.0"
+  },
+  "dependencies": {
+    "is-tracking-domain": "^1.1.8"
+  }
+}

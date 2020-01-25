@@ -1,3 +1,5 @@
+const isTrackingDomain = require('is-tracking-domain')
+
 const VIEWS = {
     main: "main",
     cookies: 'cookies'
@@ -52,6 +54,9 @@ function setHeaders() {
 }
 
 function populateTrackers() {
+
+    isTrackingDomain('doubleclick.net')
+
     const currentView = document.getElementById(ELEMENT_TYPES.DataList);
     currentView.innerHTML = `<p>howdy there trackers</p>`
 }
