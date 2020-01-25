@@ -1,4 +1,3 @@
-
 const isTrackingDomain = require('is-tracking-domain')
 const waitUntil = require('async-wait-until');
 
@@ -36,6 +35,34 @@ const AGENTS = [{
     }
 ]
 
+// based on @Permission.PermissionName
+const PERMISSIONS = [
+    "geolocation",
+    "notifications",
+    "push",
+    "midi",
+    "camera",
+    "microphone",
+    "speaker",
+    "device-info",
+    "background-sync",
+    "bluetooth",
+    "persistent-storage",
+    "ambient-light-sensor",
+    "accelerometer",
+    "gyroscope",
+    "magnetometer",
+    "clipboard"
+];
+
+// based on @Permission.PermissionState
+const PERMISSION_STATES = {
+    Granted: 'granted',
+    Denied: 'denied',
+    Prompt: 'prompt',
+    Unsupported: 'unsupported'
+}
+
 let tab = null;
 
 let currentActiveView = null;
@@ -65,23 +92,29 @@ async function getHtmlContent(tab) {
         "code": "document.documentElement.outerHTML;"
     }, resolvedHtml)
 
+    // can be replaced with promisification
     const htmlContent = await waitUntil(() => {
         return activeTrackersHtml != null
     }, 15000, 250)
-    
+
     return activeTrackersHtml;
+}
+
+function generateLoadingSpinner(type) {
+    const spinnerHTML = `<p class="text-center">Analyzing ${type} . . .
+                            <div class="d-flex justify-content-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+                        </p>`
+    return spinnerHTML;
 }
 
 async function populateTrackers() {
 
     const currentView = document.getElementById(ELEMENT_TYPES.DataList);
-    currentView.innerHTML = `<p class="text-center">Analyzing trackers . . .
-                                <div class="d-flex justify-content-center">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="sr-only">Loading...</span>
-                                    </div>
-                                </div>
-                            </p>`
+    currentView.innerHTML = generateLoadingSpinner('trackers')
 
     htmlContent = await getHtmlContent(tab);
 
@@ -98,11 +131,11 @@ async function populateTrackers() {
     let blackListed = 'No trackers found on this page.'
     if (scripts.length > 0) {
         blackListed = scripts
-        .map(source => (new URL(source.src)).hostname)
-        .filter((url, i, arr) => arr.indexOf(url) == i) // remove duplicates
-        .map(url => url.indexOf(`www.`) == 0 ? url.slice(`www.`.length) : url)
-        .map(url => addli(url, isTrackingDomain(url)))
-        .join('')
+            .map(source => (new URL(source.src)).hostname)
+            .filter((url, i, arr) => arr.indexOf(url) == i) // remove duplicates
+            .map(url => url.indexOf(`www.`) == 0 ? url.slice(`www.`.length) : url)
+            .map(url => addli(url, isTrackingDomain(url)))
+            .join('')
     }
 
     currentView.innerHTML = blackListed;
@@ -110,28 +143,50 @@ async function populateTrackers() {
 
 async function populatePermissions() {
 
-    //get all permissions used by the domain
-    const gettingAllPermissions = navigator.permissions.getAll({
-        url: tab.url
-    });
-
-    const permissions = await gettingAllPermissions;
     const currentView = document.getElementById(ELEMENT_TYPES.DataList);
-    let innerData = `<li>No permissions requested by this page.</li>`;
-    if (permissions.length > 0) {
-        // map-reduce all the permissions into one string of buttons.
-        innerData = permissions.map(permission => `<li id="${permission.name}" 
-                                            class="nav-item dropdown">
-                                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                                                ${permission.name}
-                                                </a>
-                                                <div class="dropdown-menu">
-                                                    <div class="dropdown-item">${permission.value}</a>
-                                                </div>
-                                            </li>`)
-            .join('');
-    };
-    currentView.innerHTML = innerData;
+    currentView.innerHTML = generateLoadingSpinner('permissions')
+
+    // const permissionStatus = await window.navigator.permissions.query({name:'geolocation'});
+    // alert(permissionStatus.state);
+
+    // retrieve all permission states
+    const permissionStates = []
+    PERMISSIONS.forEach(async permission => {
+        window.navigator.permissions
+        .query({name: permission})
+        .then(permissionStatus => permissionStates.push([permission, permissionStatus.state]))
+        .catch(err => permissionStates.push([permission, PERMISSION_STATES.Unsupported]))
+    })
+
+    // can be replaced with async for.
+    await waitUntil(() => {
+        return permissionStates.length == PERMISSIONS.length
+    }, 3000, 50)
+
+    function renderStateDiv(permission, state) {
+        let messageColor = '';
+        switch(state) {
+            case(PERMISSION_STATES.Granted):
+                messageColor = 'danger';
+                break;
+            case(PERMISSION_STATES.Denied):
+                messageColor = 'success';
+                break;
+            case(PERMISSION_STATES.Prompt):
+                messageColor = 'info';
+                break;
+            default:
+                messageColor = 'secondary';
+                break;
+        }
+        return `<li class="text-${messageColor}">${permission} : ${state}</li>`;
+    }
+
+    innerHtmlData = permissionStates
+        .map(([permission, state]) => renderStateDiv(permission, state)) // deconstructing permission state list
+        .join('');
+
+    currentView.innerHTML = innerHtmlData;
 }
 
 async function populateCookies() {
